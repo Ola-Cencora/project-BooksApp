@@ -15,8 +15,10 @@
     }
   }
 
-  // add books to favorites
   const favoriteBooks = [];
+
+  const filters = [];
+  filters.form = document.querySelector('.filters');
 
   function initActions(){
 
@@ -28,11 +30,9 @@
 
       let bookId = clickedBook.getAttribute('data-id');
 
-      // check if book is or is not in favorite array
+      // add books to favorite list
       if (!favoriteBooks.includes(bookId)){
-        // add class favorite to clicked book
         clickedBook.classList.add('favorite');
-        // add this book id to array
         favoriteBooks.push(bookId);
         console.log(favoriteBooks);
       } else if (favoriteBooks.includes(bookId)) {
@@ -42,6 +42,43 @@
         console.log(favoriteBooks);
       }
     });
+
+    // filters
+    filters.form.addEventListener('click', function(event){
+      if(event.target.tagName == 'INPUT' && event.target.type == 'checkbox' && event.target.name == 'filter'){
+        console.log(event.target.value); // show clicked input value
+        
+        if(event.target.checked){ // if clicked add it to filters array
+          filters.push(event.target.value);
+        } else if(!event.target.checked){ // if not, delete
+          filters.splice((filters.indexOf(event.target.value)), 1);
+        }
+      }
+      console.log('filters', filters);
+
+      filterBooks();
+    });
+  }
+
+  function filterBooks(){ // filter books according to chosen option
+    for(let book of dataSource.books){
+      let shouldBeHidden = false;
+
+      for(let filter of filters){ // does chosen filter fits to each book details?
+        if(!book.details[filter]){
+          shouldBeHidden = true; // if it doesnt fit, stop loop and...
+          break;
+        }
+      }
+
+      const filteredBooks = document.querySelector('.book__image[data-id="' + book.id + '"]'); // ...find book with apropriate id...
+
+      if(shouldBeHidden){
+        filteredBooks.classList.add('hidden'); // ... and this book class hidden
+      } else if(!shouldBeHidden){
+        filteredBooks.classList.remove('hidden'); // remove class hidden when filter fits to book
+      }
+    }
   }
 
   function init(){
